@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>Grocery Project Frontpage</title>
+
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+	<link href="{{ url_for('static', filename='css/app.css') }}" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body style="background-image: url(../static/b1.jpg)">
+
+	<div class="wrapper">
+		<nav id="sidebar" class="sidebar js-sidebar">
+			<div class="sidebar-content js-simplebar">
+				<a class="sidebar-brand" href="/">
+					<span class="align-middle">Grocery Dashboard</span>
+				</a>
+
+				<ul class="sidebar-nav">
+					<li class="sidebar-header">
+						Pages
+					</li>
+
+					<li class="sidebar-item active">
+						<a class="sidebar-link" href="/">
+							<i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Frontpage</span>
+						</a>
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="/map">
+							<i class="align-middle" data-feather="map"></i> <span class="align-middle">Store Locations</span>
+						</a>
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="/store_counts">
+							<i class="align-middle" data-feather="pie"></i> <span class="align-middle">Store Counts</span>
+						</a>
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="/store_ratings">
+							<i class="align-middle" data-feather="donut"></i> <span class="align-middle">Store Ratings</span>
+						</a>
+					</li>
+				</ul>
+
+			</div>
+		</nav>
+
+		<div class="main">
+			<nav class="navbar navbar-expand navbar-light navbar-bg">
+				<a class="sidebar-toggle js-sidebar-toggle">
+					<i class="hamburger align-self-center"></i>
+				</a>
+			</nav>
+
+
+			<main class="content">
+				<div class="container-fluid p-0">
+
+
+					<h1 class="h3 mb-3"><strong>City Selection</strong></h1>
+						<div class="row">
+							<div class="col-12 d-flex">
+								<div class="w-100">
+									<div class="card flex-fill">
+										<div class="card-header">
+											<form action="/" method="POST">
+												<div class="form-group">
+													<select class="form-select form-select-lg mb-3" name="city_state_select" data-live-search="true">
+														{% for city in all_cities %}
+														<option>{{ city }}</option>
+														{% endfor %}
+													</select>
+												</div>
+												<!-- Button for submitting form -->
+												<button type="submit" class="btn btn-primary">Confirm</button>
+											</form>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+					<h1 class="h3 mb-3"><strong>Analytics Dashboard</strong> </h1>
+
+					<div class="row">
+						<div class="col-12 d-flex">
+							<div class="w-100">
+								<div class="row">
+
+									<div class="col-md d-flex">
+										<div class="card flex-fill">
+											<div class="card-body">
+												<div class="row">
+													<div class="col mt-0">
+														<h5 class="card-title">Walmart</h5>
+													</div>
+													<div class="col-auto">
+														<div class="stat_walmart"></div>
+													</div>
+												</div>
+												<h1 class="mt-1 mb-3">{{walmart}}</h1>
+												<div class="mb-0">
+													<span class="text-muted">Total Locations</span>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="col-md d-flex">
+										<div class="card flex-fill">
+											<div class="card-body">
+												<div class="row">
+													<div class="col mt-0">
+														<h5 class="card-title">Kroger</h5>
+													</div>
+													<div class="col-auto">
+														<div class="stat_kroger"></div>
+													</div>
+												</div>
+												<h1 class="mt-1 mb-3">{{kroger}}</h1>
+												<div class="mb-0">
+													<span class="text-muted">Total Locations</span>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="col-md d-flex">
+										<div class="card flex-fill">
+											<div class="card-body">
+												<div class="row">
+													<div class="col mt-0">
+														<h5 class="card-title">Target</h5>
+													</div>
+													<div class="col-auto">
+														<div class="stat_target"></div>
+													</div>
+												</div>
+												<h1 class="mt-1 mb-3">{{target}}</h1>
+												<div class="mb-0">
+													<span class="text-muted">Total Locations</span>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="col-md d-flex">
+										<div class="card flex-fill">
+											<div class="card-body">
+												<div class="row">
+													<div class="col mt-0">
+														<h5 class="card-title">Costco</h5>
+													</div>
+													<div class="col-auto">
+														<div class="stat_costco"></div>
+													</div>
+												</div>
+												<h1 class="mt-1 mb-3">{{costco}}</h1>
+												<div class="mb-0">
+													<span class="text-muted">Total Locations</span>
+												</div>
+											</div>
+										</div>
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+					<h1 class="h3 mb-3"><strong>National Grocery Store Density Graph </strong> </h1>
+
+					<div class="row">
+
+						<div class="col-12 col-lg-8 col-xxl-4 d-flex">
+							<div class="card">
+								<div class="card-body">
+									<p><strong>Zoom In/Out:</strong></p>
+									<ul>
+										<li>Use the zoom controls on the map to explore specific areas in detail or get a broader view of the entire country.</li>
+									</ul>
+					
+									<p><strong>Pan:</strong></p>
+									<ul>
+										<li>Click and drag to navigate across the map and focus on different states or regions.</li>
+									</ul>
+					
+									<p><strong>Dark Colors:</strong></p>
+									<ul>
+										<li>Areas with darker colors on the map represent higher grocery store density, indicating a larger number of stores in proximity.</li>
+									</ul>
+					
+									<p><strong>Light Colors:</strong></p>
+									<ul>
+										<li>Conversely, lighter shades signify lower store density, suggesting fewer grocery stores in the selected region.</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					
+						<div class="col-12 col-lg-8 col-xxl-8 d-flex">
+							<div class="card flex-fill">
+								<div class="card-header">
+									<h5 class="card-title mb-0">Store Locations By State</h5>
+								</div>
+								{{ choro_map_html | safe }}
+							</div>
+						</div>
+					</div>
+
+
+					<h1 class="h3 mb-3"><strong> National Store Concerntration of Top 10 City</strong> </h1>
+
+					<div class="row">
+						<div class="col-12 col-lg-8 col-xxl-8 d-flex">
+							<div class="card flex-fill">
+								<div class="card-header">
+									<h5 class="card-title mb-0">Top Cities By Brand</h5>
+								</div>
+
+								<div>
+									<select id="dataSelector" onchange="updateChart()">
+											<option value="all">All Brands</option>
+											<option value="walmart">Walmart</option>
+											<option value="kroger">Kroger</option>
+											<option value="target">Target</option>
+											<option value="costco">Costco</option>
+									</select>
+								</div>
+
+								<canvas id="top_bar"></canvas>
+							</div>
+						</div>
+
+						<div class="col-12 col-lg-8 col-xxl-4 d-flex">
+							<div class="card">
+								<div class="card-body">
+									<p><strong>Selected by Brand:</strong></p>
+									<ul>
+										<li>Choose a brand from the dropdown to generate a tailored bar chart, revealing key metrics for the selected brand across the top ten cities with the highest concentration. </li>
+									</ul>
+								</div>
+							</div>
+						</div>
+						
+					</div>
+
+				</div>
+			</main>
+
+		</div>
+	</div>
+
+	<script>
+		// Sample data for different sources
+		const dataSources = {{ top_cities_data|tojson }}
+
+		// Initial data source
+		let currentDataSource = 'all';
+
+		// Chart instance
+		let myChart;
+
+		// Function to update the chart based on the selected data source
+		function updateChart() {
+			const selectedDataSource = document.getElementById('dataSelector').value;
+			currentDataSource = selectedDataSource;
+
+			// Get the data for the selected source
+			const { labels, data, backgroundColor } = dataSources[currentDataSource];
+
+			// If chart instance exists, destroy it
+			if (myChart) {
+				myChart.destroy();
+			}
+
+			// Update the chart with new data and labels
+			updateChartData(labels, data, backgroundColor);
+		}
+
+		// Function to update the chart data
+		function updateChartData(labels, data, backgroundColor) {
+			const ctx = document.getElementById('top_bar').getContext('2d');
+
+			// Create a new chart
+			myChart = new Chart(ctx, {
+				type: 'bar',
+				data: {
+					labels: labels,
+					datasets: [{
+						label: 'Data Source',
+						data: data,
+						backgroundColor: backgroundColor,
+						borderColor: backgroundColor.replace('0.2', '1'),
+						borderWidth: 1
+					}]
+				},
+				options: {
+					scales: {
+						y: {
+							beginAtZero: true
+						}
+					}
+				}
+			});
+		}
+
+		// Initial chart setup
+		updateChart();
+	</script>
+
+	<!-- Javascript -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
+	</script>
+
+</body>
+
+</html>

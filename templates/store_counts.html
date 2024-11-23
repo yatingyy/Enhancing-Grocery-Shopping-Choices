@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>Grocery Project Frontpage</title>
+
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" 
+		rel="stylesheet" 
+		integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" 
+		crossorigin="anonymous">
+	<link href="{{ url_for('static', filename='css/app.css') }}" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body style="background-image: url(../static/b1.jpg)">
+
+	<div class="wrapper">
+		<nav id="sidebar" class="sidebar js-sidebar">
+			<div class="sidebar-content js-simplebar">
+				<a class="sidebar-brand" href="/">	
+          <span class="align-middle">Grocery Dashboard</span>
+        </a>
+
+				<ul class="sidebar-nav">
+					<li class="sidebar-header">
+						Pages
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="/">
+              <i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Frontpage</span>
+            </a>
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="/map">
+              <i class="align-middle" data-feather="map"></i> <span class="align-middle">Store Locations</span>
+            </a>
+					</li>
+
+					<li class="sidebar-item active">
+						<a class="sidebar-link" href="/store_counts">
+              <i class="align-middle" data-feather="pie"></i> <span class="align-middle">Store Counts</span>
+            </a>
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="/store_ratings">
+              <i class="align-middle" data-feather="donut"></i> <span class="align-middle">Store Ratings</span>
+            </a>
+					</li>
+				</ul>
+
+			</div>
+		</nav>
+
+		<div class="main">
+			<nav class="navbar navbar-expand navbar-light navbar-bg">
+				<a class="sidebar-toggle js-sidebar-toggle">
+          <i class="hamburger align-self-center"></i>
+        </a>
+			</nav>
+
+      <main class="content">
+
+				<div class="container-fluid p-0">
+
+					<h1 class="h3 mb-3">Store Counts for <strong>{{current_city_state}}</strong></h1>
+
+          <div class="row">
+
+            <div class="col-10 d-flex">
+              <div class="card flex-fill w-100">
+                <div class="card-header">
+                  <p>Here are the distribution of the differnt store brands in {{current_city_state}}, 
+                    there is a pie chart, a bar chart, and a table for easy understanding incase that you are a hard time inteperating one or the other. 
+                    Hovering over the charts will show you a detailed number on how many stores each brand has in {{current_city_state}}.
+                  </p>
+                  <br>
+                  <p>Want to see another city? Simply navigate back to the <a href="/">Frontpage</a> and select a different city!</p>
+								</div>
+              </div>
+            </div>
+          </div>
+            
+
+					<div class="row">
+
+						<div class="col-12 col-lg-8 col-xxl-5 d-flex">
+							<div class="card flex-fill w-100">
+								<div class="card-header">
+									<h5 class="card-title mb-0">Store Percentage</h5>
+								</div>
+								<div class="card-body d-flex w-100">
+									<div class="align-self-center chart chart-lg">
+										<canvas id="groceryChart"></canvas>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-12 col-lg-8 col-xxl-5 d-flex">
+							<div class="card flex-fill w-100">
+								<div class="card-header">
+									<h5 class="card-title mb-0">Store Count Bar</h5>
+								</div>
+								<div class="card-body d-flex w-100">
+									<div class="align-self-center chart chart-lg">
+										<canvas id="bar"></canvas>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+					</div>
+
+          
+          <div class="row">
+
+						<div class="col-12 col-lg-3 col-xxl-10 d-flex">
+							<div class="card flex-fill w-100">
+								<div class="card-header">
+									<h5 class="card-title mb-0">Store Count Table</h5>
+								</div>
+								<div class="card-body d-flex w-100">
+									<div class="align-self-center chart chart-lg">
+										<div id="mydiv"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+					</div>
+
+				</div>
+			</main>
+
+		</div>
+	</div>
+
+  <script>
+    // Provided dataset
+    var data = {{ pie_data|tojson }}
+
+    var style = document.createElement('style');
+    style.innerHTML = `
+    #groceryChart {
+    width: 100%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    font-family: sans-serif;
+    }
+
+    .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    }
+    
+    .chartjs-legend-item {
+    font-size: 20px; /* Increase font size */
+    padding: 10px 20px;
+    }
+
+    .chartjs-legend {
+        padding: 20px; /* Increase padding */
+    }
+    `;
+
+    document.head.appendChild(style);
+
+
+    // Calculate total sales
+    var totalSales = data.datasets[0].data.reduce((acc, cur) => acc + cur, 0);
+
+    // Calculate percentages and angles
+    for (var i = 0; i < data.datasets[0].data.length; i++) {
+      var percentage = (data.datasets[0].data[i] / totalSales) * 100;
+      var angle = (percentage / 100) * 2 * Math.PI; // Convert percentage to angle
+
+      // Set start and end angles for each slice
+      if (i === 0) {
+        data.datasets[0].data[i].startAngle = 0;
+        data.datasets[0].data[i].endAngle = angle;
+      } else {
+        var previousEndAngle = data.datasets[0].data[i - 1].endAngle;
+        data.datasets[0].data[i].startAngle = previousEndAngle;
+        data.datasets[0].data[i].endAngle = previousEndAngle + angle;
+      }
+
+      // Add percentage sign to labels
+      data.labels[i] += ' (' + percentage.toFixed(2) + '%)';
+    }
+
+    // Configuration options
+    var options = {
+      title: {
+        display: true,
+        text: 'Grocery Store Percentage by Brand in the Area'
+      }
+    };
+
+    // Get the canvas element
+    var ctx = document.getElementById('groceryChart').getContext('2d');
+
+    // Create a pie chart
+    var groceryChart = new Chart(ctx, {
+      type: 'pie',
+      data: data,
+      options: options
+    });
+  </script>
+
+  <script>
+    // Bar chart referring to the table comparing the number of stores by brand (City Level)
+    // Get data passed from Flask
+    var storeData = {{ bar_data|tojson }};
+
+    const brandColors = {
+      'walmart': '#ffc22080',
+      'costco': 'rgba(128, 128, 128, 0.6)',
+      'target': 'rgba(255, 0, 0, 0.6)',
+      'kroger': 'rgba(0, 0, 255, 0.6)'
+    };
+
+    const countStoresByBrand = () => {
+      const brandCounts = {
+        'walmart': 0,
+        'costco': 0,
+        'target': 0,
+        'kroger': 0
+      };
+
+      storeData.forEach(store => {
+        const brand = store[6].toLowerCase(); // Assuming brand is in the 7th column
+        if (brandCounts.hasOwnProperty(brand)) {
+          brandCounts[brand]++;
+        }
+      });
+
+      return Object.values(brandCounts);
+    };
+
+    // Get the canvas element
+    const ctx_bar = document.getElementById('bar').getContext('2d');
+
+    // Initial data
+    const data_bar = {
+      labels: Object.keys(brandColors),
+      datasets: [{
+        label: 'Number of Stores by Brand',
+        data: countStoresByBrand(),
+        backgroundColor: Object.values(brandColors),
+        borderColor: Object.values(brandColors),
+        borderWidth: 1
+      }]
+    };
+
+    // Configure options for the chart
+    const options_bar = {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    };
+
+    // Create a new Bar Chart instance
+    const myBarChart = new Chart(ctx_bar, {
+      type: 'bar',
+      data: data_bar,
+      options: options_bar
+    });
+  </script>
+
+  <script>
+    var data = {{ table_data|tojson }}
+
+    // Create a style element for the table
+    var style = document.createElement('style');
+    style.innerHTML = `
+    #storeTable {
+      width: 100%;
+      margin: 0 auto;
+      border-collapse: collapse;
+      font-family: sans-serif;
+    }
+
+    th, td {
+      text-align: center;
+      padding: 20px;
+      border: 2px solid black; /* Changed line color to black */
+      font-size: 25px; /* Increased font size to 18px */
+    }
+    `;
+    document.head.appendChild(style);
+
+    // Create a table element
+    var rot = document.getElementById('mydiv')
+    var table = document.createElement('table');
+    table.setAttribute('id', 'storeTable');
+
+    // Create the table header
+    var tableHeader = document.createElement('thead');
+    tableHeader.innerHTML = '<tr><th>Brand</th><th>Number of Stores</th></tr>';
+    table.appendChild(tableHeader);
+
+    // Create the table body
+    var tableBody = document.createElement('tbody');
+    for (var i = 0; i < data.labels.length; i++) {
+      var row = document.createElement('tr');
+      row.innerHTML = '<td>' + data.labels[i] + '</td><td>' + data.datasets[0].data[i] + '</td>';
+      tableBody.appendChild(row);
+    }
+    table.appendChild(tableBody);
+    rot.appendChild(table)
+
+  </script>
+
+
+	<!-- Javascript -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" 
+		integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" 
+		crossorigin="anonymous">
+	</script>
+
+</body>
+
+</html>
+

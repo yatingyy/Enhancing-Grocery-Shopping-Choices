@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>Grocery Project Frontpage</title>
+
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" 
+		rel="stylesheet" 
+		integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" 
+		crossorigin="anonymous">
+	<link href="{{ url_for('static', filename='css/app.css') }}" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body style="background-image: url(../static/b1.jpg)">
+
+	<div class="wrapper">
+		<nav id="sidebar" class="sidebar js-sidebar">
+			<div class="sidebar-content js-simplebar">
+				<a class="sidebar-brand" href="/">	
+          <span class="align-middle">Grocery Dashboard</span>
+        </a>
+
+				<ul class="sidebar-nav">
+					<li class="sidebar-header">
+						Pages
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="/">
+              <i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Frontpage</span>
+            </a>
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="/map">
+              <i class="align-middle" data-feather="map"></i> <span class="align-middle">Store Locations</span>
+            </a>
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="/store_counts">
+              <i class="align-middle" data-feather="pie"></i> <span class="align-middle">Store Counts</span>
+            </a>
+					</li>
+
+					<li class="sidebar-item active">
+						<a class="sidebar-link" href="/store_ratings">
+              <i class="align-middle" data-feather="donut"></i> <span class="align-middle">Store Ratings</span>
+            </a>
+					</li>
+				</ul>
+
+			</div>
+		</nav>
+
+		<div class="main">
+			<nav class="navbar navbar-expand navbar-light navbar-bg">
+				<a class="sidebar-toggle js-sidebar-toggle">
+          <i class="hamburger align-self-center"></i>
+        </a>
+			</nav>
+
+			<main class="content">
+
+				<div class="container-fluid p-0">
+
+					<h1 class="h3 mb-3">Store Ratings for <strong>{{current_city_state}}</strong></h1>
+
+					<div class="row">
+
+            <div class="col-12 d-flex">
+              <div class="card flex-fill w-100">
+                <div class="card-header">
+                  <p>Here is the average rating of the stores in {{current_city_state}}, 
+                    the donut chart to the left indicates {{current_city_state}}'s average rating across the four categories, 
+										the radar chart to the right are the metrics that we used to compute the rating for {{current_city_state}}.
+                    Hovering over the pieces will show you a detailed number of the metrics.
+                  </p>
+                  <br>
+                  <p>Want to see another city? Simply navigate back to the <a href="/">Frontpage</a> and select a different city!</p>
+								</div>
+              </div>
+            </div>
+          </div>
+
+
+					<div class="row">
+
+						<div class="col-12 col-lg-8 col-xxl-7 d-flex">
+							<div class="card flex-fill w-100">
+								<div class="card-header">
+									<h5 class="card-title mb-0">Average Store Ratings</h5>
+								</div>
+								<div class="card-body d-flex w-100">
+									<div class="align-self-center chart chart-lg">
+										<canvas id="donut"></canvas>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-12 col-lg-8 col-xxl-5 d-flex">
+							<div class="card flex-fill w-100">
+								<div class="card-header">
+									<h5 class="card-title mb-0">Rating Metrics</h5>
+								</div>
+								<div class="card-body d-flex w-100">
+									<div class="align-self-center chart chart-lg">
+										<canvas id="radar"></canvas>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+					</div>
+
+				</div>
+			</main>
+
+		</div>
+	</div>
+
+	<script>
+		// Donut charts of the average ratings within the choosen city
+		// Calculation: take average of all the ratings under one category for all four categories
+		// Get data passed from Flask
+		var storeData = {{ data|tojson }};
+
+		// Get the canvas element
+		const ctx = document.getElementById('donut').getContext('2d');
+
+		// Calculate average ratings for each category
+		const categories = ['cheap', 'fresh', 'variety', 'friendly'];
+		const averages = {};
+
+		categories.forEach(category => {
+			const total = storeData.reduce((acc, store) => acc + store[category], 0);
+			averages[category] = total / storeData.length;
+		});
+
+		// Prepare data for the chart
+		const data = {
+			labels: categories,
+			datasets: [{
+				data: categories.map(category => averages[category]),
+				backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50'],
+				hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50']
+			}]
+		};
+
+		// Configure options for the chart
+		const options = {
+			cutoutPercentage: 50, // Set cutoutPercentage to create a donut chart
+			responsive: true,
+			maintainAspectRatio: false
+		};
+
+		// Create a Donut Chart instance
+		const myDonutChart = new Chart(ctx, {
+			type: 'doughnut',
+			data: data,
+			options: options
+		});
+
+	</script>
+
+	<script>
+		// Donut charts of the average ratings within the choosen city
+		// Calculation: take average of all the ratings under one category for all four categories
+		// Get data passed from Flask
+		var storeData = {{ Radardata|tojson }};
+
+		// Function to create and update the radar chart
+		function updateChart() {
+			// Get the canvas element
+			const ctx = document.getElementById('radar').getContext('2d');
+
+			const storeColors = [
+				'rgba(0, 0, 255, 0.2)',   // Blue
+				'rgba(128, 128, 128, 0.2)', // Gray
+				'rgba(255, 0, 0, 0.2)',     // Red
+				'#ffc22080'    // Yellow
+			];
+
+			// Prepare data for the chart
+			const data = {
+				labels: ['Cheap', 'Fresh', 'Variety', 'Friendly'],
+				datasets: storeData.map((store, index) => ({
+					label: store.brand,
+					data: [store.cheap, store.fresh, store.variety, store.friendly],
+					backgroundColor: storeColors[index],
+					borderColor: storeColors[index],
+					borderWidth: 2,
+					pointBackgroundColor: storeColors[index]
+				}))
+			};
+
+			// Configure options for the chart
+			const options = {
+				scales: {
+					r: {
+						suggestedMin: 1,
+						suggestedMax: 5
+					}
+				}
+			};
+
+			// Destroy the existing chart (if any) to prevent rendering issues
+			if (window.myRadarChart) {
+				window.myRadarChart.destroy();
+			}
+
+			// Create a new Radar Chart instance
+			window.myRadarChart = new Chart(ctx, {
+				type: 'radar',
+				data: data,
+				options: options
+			});
+		}
+
+		// Initial chart creation
+		updateChart();
+	</script>
+
+	<!-- Javascript -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" 
+		integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" 
+		crossorigin="anonymous">
+	</script>
+
+</body>
+
+</html>
+

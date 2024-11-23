@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>Grocery Project Frontpage</title>
+
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" 
+		rel="stylesheet" 
+		integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" 
+		crossorigin="anonymous">
+	<link href="{{ url_for('static', filename='css/app.css') }}" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body style="background-image: url(../static/b1.jpg)">
+
+	<div class="wrapper">
+		<nav id="sidebar" class="sidebar js-sidebar">
+			<div class="sidebar-content js-simplebar">
+				<a class="sidebar-brand" href="/">	
+          <span class="align-middle">Grocery Dashboard</span>
+        </a>
+
+				<ul class="sidebar-nav">
+					<li class="sidebar-header">
+						Pages
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="/">
+              <i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Frontpage</span>
+            </a>
+					</li>
+
+					<li class="sidebar-item active">
+						<a class="sidebar-link" href="/map">
+              <i class="align-middle" data-feather="map"></i> <span class="align-middle">Store Locations</span>
+            </a>
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="/store_counts">
+              <i class="align-middle" data-feather="pie"></i> <span class="align-middle">Store Counts</span>
+            </a>
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="/store_ratings">
+              <i class="align-middle" data-feather="donut"></i> <span class="align-middle">Store Ratings</span>
+            </a>
+					</li>
+				</ul>
+
+			</div>
+		</nav>
+
+		<div class="main">
+			<nav class="navbar navbar-expand navbar-light navbar-bg">
+				<a class="sidebar-toggle js-sidebar-toggle">
+          <i class="hamburger align-self-center"></i>
+        </a>
+			</nav>
+
+			<main class="content">
+				<div class="container-fluid p-0">
+
+					<h1 class="h3 mb-3">Store Locations in <strong>{{current_city_state}}</strong> </h1>
+
+
+					<div class="row">
+
+            <div class="col-12 d-flex">
+              <div class="card flex-fill w-100">
+                <div class="card-header">
+                  <p>Here is a map displaying all the stores in {{current_city_state}}, browse the map to see where stores are located!
+                  </p>
+                  <br>
+                  <p>Want to see another city? Simply navigate back to the <a href="/">Frontpage</a> and select a different city!</p>
+								</div>
+              </div>
+            </div>
+          </div>
+
+
+					<div class="row">
+					
+						<div class="col-12 col-lg-8 col-xxl-8 d-flex">
+							<div class="card flex-fill">
+								<div class="card-header">
+									<h5 class="card-title mb-0">Store Locations</h5>
+								</div>
+								{{ map_html | safe }}
+							</div>
+						</div>
+
+						<div class="col-12 col-lg-8 col-xxl-4 d-flex">
+							<div class="card">
+								<div class="card-body">
+									<p><strong>Zoom In/Out:</strong></p>
+									<ul>
+										<li>Use the zoom controls on the map to explore specific areas of the selected city in detail.</li>
+									</ul>
+					
+									<p><strong>Pan:</strong></p>
+									<ul>
+										<li>Click and drag to navigate across the map and focus on different parts of the city, clicking on each icon also shows the location details of the store.</li>
+									</ul>
+					
+									<p><strong>Colors:</strong></p>
+									<ul>
+										<li>Each color represent a differnet brand. 
+											<span style="color: #ffc22080;">Yellow</span> represents Walmart, 
+											<span style="color: #80808099;">Gray</span> represents Costco,
+											<span style="color: #ff000099;">Red</span> represents Target,
+											<span style="color: #0000ff99;">Blue</span> represents Kroger.
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</main>
+		</div>
+	</div>
+
+	<!-- Javascript -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" 
+		integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" 
+		crossorigin="anonymous">
+	</script>
+
+</body>
+
+</html>
